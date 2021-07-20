@@ -3,7 +3,7 @@
         <div>
             <h6>アプリを選択</h6>
             <div v-if="apps.length > 0">
-                <div v-for="app in apps" v-bind:key="app.id" class="card" @click="onClick(false, app)">
+                <div v-for="app in apps" v-bind:key="app.id" class="card" @click="setApp(app)">
                     <div class="card-body">
                         <h6>{{app.name}}</h6>
                         <p><small>作成日: {{app.created}}</small></p>
@@ -19,7 +19,7 @@
             <div class="mb-3">
                 <label>アプリ名</label>
                 <input class="form-control" type="text" placeholder="SNSアプリ" v-model="newAppName" />
-                <input class="btn btn-primary" type="button" value="送信" @click="onClick(true)" />
+                <input class="btn btn-primary" type="button" value="送信" @click="setApp()" />
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@ interface Data {
 }
 
 interface Method {
-    onClick(newApp: boolean): void;
+    setApp(app?: App): void;
 }
 
 interface Computed {}
@@ -56,11 +56,10 @@ export default Vue.extend({
     },
 
     methods: {
-        async onClick (newApp: boolean, app?: App) {
-            if (newApp === true) {
+        async setApp (app?: App) {
+            if (app === undefined) {
                 const res = await this.$axios.post(endpoint, {name: this.newAppName});
-                const app: App = res.data.app;
-                this.$store.commit("appData/setApp", {id: app.id, name: app.name, created: new Date(app.created)});
+                this.$store.commit("appData/setApp", res.data.app);
             } else {
                 this.$store.commit("appData/setApp", app);
             }

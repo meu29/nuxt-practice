@@ -1,7 +1,27 @@
 model App {
   id String @id
   name String
-  created DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model State {
+  stateId String @id
+  appId String
+  name String
+}
+
+model Action {
+  actionId String @id
+  appId String
+  name String
+}
+
+model Transition {
+  transitionId Int @id @default(autoincrement())
+  appId String
+  stateId String
+  actionId String
+  nextStateId String
 }
 
 datasource db {

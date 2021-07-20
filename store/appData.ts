@@ -5,12 +5,12 @@ export type App = {
 }
 
 type State = {
-    app: App | {}
+    app: App | null
 }
 
 export const state = (): State => {
     return {
-        app: {}
+        app: null
     }
 };
 
@@ -28,5 +28,8 @@ export const mutations = {
     setApp(state: State, app: App) {
         state.app = app;
     },
+    releaseApp(state: State) {
+        state.app = null
+    }
 
 }
