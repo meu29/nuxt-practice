@@ -1,0 +1,14 @@
+model App {
+  id String @id
+  name String
+  created DateTime @default(now())
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db.sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
