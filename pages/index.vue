@@ -1,72 +1,49 @@
 <template>
-    <div>
-        <div>
-            <h6>アプリを選択</h6>
-            <div v-if="apps.length > 0">
-                <div v-for="app in apps" v-bind:key="app.id" class="card" @click="setApp(app)">
-                    <div class="card-body">
-                        <h6>{{app.name}}</h6>
-                        <p><small>作成日: {{app.created}}</small></p>
-                    </div>
-                </div>
-            </div>
-            <div v-else>
-                <p>登録されているアプリはありません</p>
-            </div>
-        </div>
-        <div>
-            <h6>もしくは.. アプリを登録</h6>
-            <div class="mb-3">
-                <label>アプリ名</label>
-                <input class="form-control" type="text" placeholder="SNSアプリ" v-model="newAppName" />
-                <input class="btn btn-primary" type="button" value="送信" @click="setApp()" />
-            </div>
-        </div>
-    </div>
+    <v-container>
+        <v-text-field v-model="email" label="メールアドレス" :rules="nameRules"></v-text-field>
+        <v-text-field v-model="name" label="ユーザー名" :rules="emailRules"></v-text-field>
+        <v-text-field v-model="password" label="パスワード" :rules="passwordRules"></v-text-field>
+        <v-btn color="primary" @click="transition(true)">サインイン</v-btn>
+        <v-btn @click="transition(false)">ログインせずに始める</v-btn>
+    </v-container>
 </template>
 
 <script lang="ts">
 
-import Vue from "vue";
-import { ThisTypedComponentOptionsWithRecordProps } from "vue/types/options";
-import { App } from "./../store/appData";
-
-interface Data {
-    apps: App[], 
-    newAppName: string
+/* バリデーションルール */
+/* 条件に一致していればtrueを返し、そうでなければエラーメッセージを返す。*/
+type Rule = {
+    (value: string): true | string
 }
 
-interface Method {
-    setApp(app?: App): void;
+type Rules = {[name: string]: Rule}
+
+const baseRules: Rules = {
+    noInput: (value: string) => value.length > 0 || "未入力です"
 }
 
-interface Computed {}
-interface Props {}
+export default {
 
-const endpoint: string = "http://localhost:3000/api/app";
-
-export default Vue.extend({
-
-    async asyncData(context): Promise<Data> {
-        const res = await context.$axios.get(endpoint);
+    data():{name: string, email: string, password: string, nameRules: Rules, emailRules: Rules, passwordRules: Rules} {
         return {
-            apps: res.data.apps,
-            newAppName: ""
+            name: "", 
+            email: "", 
+            password: "", 
+            nameRules: baseRules,
+            emailRules: baseRules,
+            passwordRules: baseRules
         }
     },
 
     methods: {
-        async setApp (app?: App) {
-            if (app === undefined) {
-                const res = await this.$axios.post(endpoint, {name: this.newAppName});
-                this.$store.commit("appData/setApp", res.data.app);
-            } else {
-                this.$store.commit("appData/setApp", app);
+        transition(account: boolean) {
+            if (account === true) {
+                return;
             }
-            this.$router.push("/transition");
+            this.$router.push("/quiz");
         }
     }
 
-} as ThisTypedComponentOptionsWithRecordProps<Vue, Data, Method, Computed, Props>);
+}
 
 </script>
