@@ -1,6 +1,4 @@
-type User = {
-    id: string;
-}
+import { User } from "./../types/user";
 
 type State = {
     user: User | null

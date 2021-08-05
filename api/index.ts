@@ -1,9 +1,18 @@
-import Express, { Response } from "express";
+import express, { Request, Response } from "express";
 import { Question } from "./../types/quiz";
 import fs from "fs";
+import { PrismaClient } from "@prisma/client";
 
-const app = Express();
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+const prisma = new PrismaClient();
+
+app.post("/user", (req: Request, res: Response) => {
+    const name: string = req.body.name === "" ? "名無し" : req.body.name;
+    return res.status(200).json({id: Math.random().toString(32).substring(2), name: name});
+});
 
 app.get("/quiz", (_, res: Response) => {
 
