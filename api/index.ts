@@ -59,6 +59,12 @@ app.get("/quiz", (_, res: Response) => {
 
 });
 
+app.get("/quiz/hint", (req: Request, res: Response) => {
+    return res.status(200).json({
+        hints: [...Array(10)].map((_, index: number) => req.query.id + "のヒント" + (index + 1).toString() + "は〇〇〇〇〇〇〇〇〇〇〇〇です")
+    })
+});
+
 module.exports = {
     path: "/api",
     handler: app

@@ -8,7 +8,9 @@
         <v-row>
             <!-- v-colは横並び -->
             <v-col v-for="candidate in $store.getters['quiz/questions'][index].candidates" v-bind:key="candidate">
-                <v-btn color="primary" @click="checkAnswer(candidate)">{{candidate}}</v-btn>
+                <v-card @click="checkAnswer(candidate)" width="300" align="center">
+                    <v-card-title class="justify-center">{{candidate}}</v-card-title>
+                </v-card>
             </v-col>
         </v-row>
         <v-row>
@@ -17,18 +19,15 @@
         <v-row v-if="judge !== null">
             <p>{{judge}}</p>
             <p>正解は{{$store.getters["quiz/questions"][this.$data.index].answer}}でした</p>
-            <v-btn @click="getNextQuestion()">次の問題</v-btn>
-            <v-btn v-if="finish === true" @click="replay()">再挑戦</v-btn>
+            <v-btn v-if="index < this.$store.getters['quiz/questions'].length - 1" @click="getNextQuestion()">次の問題</v-btn>
+            <v-btn @click="replay()">リスタート</v-btn>
         </v-row>
-        <v-row>
-            <v-row>
+        <v-row justify="center">
                 <p>アクション</p>
                 <p>各アクションはそれぞれ1回ずつ使用できます</p>
-            </v-row>
-            <v-col>
                 <v-btn @click="filtering()" v-bind:color="actions.filter === true ? 'error' : ''" v-bind:disabled="actions.filter === true ? false : true">絞り込み</v-btn>
                 <v-btn @click="getSecondChance()" v-bind:color="actions.chance === 'unused' ? 'error' : ''" v-bind:disabled="actions.chance === 'unused' ? false : true">セカンドチャンス</v-btn>
-            </v-col>
+                <v-btn @click="getHints()" v-bind:color="actions.hint === true ? 'error' : ''" v-bind:disabled="actions.hint === true ? false : true">他のプレイヤーからヒントをもらう</v-btn>
         </v-row>
     </v-container>
 </template>
@@ -43,7 +42,8 @@ type Datas = {
     message: string;
     actions: {
         filter: boolean,
-        chance: "unused" | "using" | "used" 
+        chance: "unused" | "using" | "used",
+        hint: boolean
     }
 }
 
@@ -55,7 +55,8 @@ const initDatas: Datas = {
     message: "",
     actions: {
         filter: true,
-        chance: "unused"
+        chance: "unused",
+        hint: true
     }
 }
 
@@ -65,6 +66,7 @@ type Methods = {
     replay(): void;
     filtering(): void;
     getSecondChance(): void;
+    getHints(): void;
 }
 
 import Vue from "vue";
@@ -103,17 +105,9 @@ export default Vue.extend<Datas, Methods, {}, {}>({
         },
 
         getNextQuestion() {
-
             this.$data.judge = null;
             this.$data.message = "";
-
-            if (this.$data.index === this.$store.getters["quiz/questions"].length - 1) {
-                this.$data.message = this.$store.getters["quiz/questions"].length + "問中" + this.$data.correct_answer_count + "問正解";
-                this.$data.finish = true;
-            } else {
-                this.$data.index += 1;
-            }
-
+            this.$data.index += 1;
         },
 
         /* watchQueryのようなものでdata.finishtrue -> falseを監視しasyncDataを再実行できないか */
@@ -131,7 +125,7 @@ export default Vue.extend<Datas, Methods, {}, {}>({
 
         filtering() {
             if (this.$data.judge !== null) {
-                alert("既に回答済みです");
+                this.$data.message = "既に回答済みです";
             } else { 
                 this.$data.actions.filter = false;
                 this.$store.commit("quiz/filtering", this.$store.getters["quiz/questions"][this.$data.index].id);
@@ -140,14 +134,29 @@ export default Vue.extend<Datas, Methods, {}, {}>({
 
         getSecondChance() {
             if (this.$data.judge !== null) {
-                alert("既に回答済みです");
+                this.$data.message = "既に回答済みです";
             } else {
                 this.$data.actions.chance = "using";
                 this.$data.message = "この問題は2回まで回答できます";
             }
+        },
+
+        async getHints() {
+            const res = await this.$axios.get(`http://localhost:3000/api/quiz/hint?id=${this.$store.getters["quiz/questions"][this.$data.index].id}`);
+            this.$data.message = JSON.stringify(res.data.hints);
+            this.$data.actions.hint = false;
         }
 
     },
+
+    watch: {
+        /* judgeプロパティの値の変更を検知 */
+        judge: function () {
+            if (this.$data.judge !== null && this.$data.index === this.$store.getters["quiz/questions"].length - 1) {
+                this.$data.message = this.$store.getters["quiz/questions"].length + "問中" + this.$data.correct_answer_count + "問正解";
+            }
+        }
+    }
 
 });
 
