@@ -17,6 +17,7 @@ let store = {};
   // Enforce store modules
   store.modules = store.modules || {}
 
+  resolveStoreModules(require('../store/quiz.ts'), 'quiz.ts')
   resolveStoreModules(require('../store/user.ts'), 'user.ts')
 
   // If the environment supports hot reloading...
@@ -24,6 +25,7 @@ let store = {};
   if (process.client && module.hot) {
     // Whenever any Vuex module is updated...
     module.hot.accept([
+      '../store/quiz.ts',
       '../store/user.ts',
     ], () => {
       // Update `root.modules` with the latest definitions.

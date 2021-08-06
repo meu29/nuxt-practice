@@ -1,7 +1,7 @@
 export type Answer = string | number;
 
 export type Question = {
-    qid: string;
+    id: string;
     content: string;
     answer: Answer;
     candidates: Answer[];
