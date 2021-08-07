@@ -1,10 +1,10 @@
 [
   {
-    "name": "quiz",
-    "path": "/quiz",
-    "component": "/home/meu/ドキュメント/nuxt-practice/pages/quiz.vue",
-    "chunkName": "pages/quiz",
-    "_name": "_1deebcf3"
+    "name": "result",
+    "path": "/result",
+    "component": "/home/meu/ドキュメント/nuxt-practice/pages/result.vue",
+    "chunkName": "pages/result",
+    "_name": "_7d12b53b"
   },
   {
     "name": "index",

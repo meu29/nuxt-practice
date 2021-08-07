@@ -23,3 +23,4 @@ async asyncData(context): Promise<{questions: Question[], index: number, correct
 
 }
 ```
+フォームバリデーションの使い方 https://gist.github.com/meu29/2e6ce2d9e7a62285dc19b8cc37f34b09<br>

@@ -9,31 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 
 const prisma = new PrismaClient();
 
-app.post("/user", (req: Request, res: Response) => {
-    const selected: {[key: string]: true} = {id: true, password: true}
-    try {
-        let user = prisma.user.findFirst({where: {email: req.body.email, password: req.body.password}, select: selected});
-        if (req.body.new_user === true) {
-            if (user !== null) {
-                /* 作成したリソースが既に存在する場合(登録済みのメールアドレスで登録しようとした時) */
-                return res.status(409);
-            } else {
-                user = prisma.user.create({data: {id: Math.random().toString(32).substring(2), name: req.body.name, email: req.body.email, password: req.body.password}, select: selected});
-                return res.status(201).json({user: user});
-            }
-        } else {
-            if (user === null) {
-                res.status(404);
-            } else {
-                res.status(200).json({user: user});
-            }
-        }
-    } catch (e) {
-        console.log(e);
-        return res.status(500);
-    }
-});
-
 app.get("/quiz", (_, res: Response) => {
 
     let questions: Question[] = [];
@@ -62,7 +37,17 @@ app.get("/quiz", (_, res: Response) => {
 app.get("/quiz/hint", (req: Request, res: Response) => {
     return res.status(200).json({
         hints: [...Array(10)].map((_, index: number) => req.query.id + "のヒント" + (index + 1).toString() + "は〇〇〇〇〇〇〇〇〇〇〇〇です")
-    })
+    });
+});
+
+app.post("/quiz/hint", async (req: Request, res: Response) => {
+    try {
+        await prisma.hint.create({data: {questionId: req.body.question_id, content: req.body.content}});
+        return res.status(201);
+    } catch (e) {
+        console.log(e);
+        return res.status(500);
+    }
 });
 
 module.exports = {
