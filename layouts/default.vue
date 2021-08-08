@@ -1,6 +1,8 @@
 <template>
     <v-app>
         <Header />
+        <!-- headerにマージンを設定する方法がわからないので -->
+        <div style="margin-bottom: 3%;"></div>
         <v-main>
             <Nuxt />
         </v-main>

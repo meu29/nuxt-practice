@@ -43,6 +43,7 @@ export const getters = {
 /* ステートの値を書き換えるのに用いる(同期処理 非同期処理はアクションで扱う) */
 export const mutations = {
     init: (state: State, questions: Question[]) => {
+        state.questions = []
         state.questions = questions;
         state.user_answers = {}
     },
